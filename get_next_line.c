@@ -11,100 +11,46 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+#include <stdio.h>
+#include <string.h>
 
-static char *ft_read(int fd, char *ost, int BUFF_SIZE)
+size_t	ft_dlina(char *str)
 {
-	int	a;
-
-	ost = malloc(sizeof(char) * BUFF_SIZE);
-	if (ost == 0)
-		return (0);
-	a = read(fd, ost, BUFF_SIZE + 1);
-	if (a == 0)
-		return (0);
-	ost[a] = '\0';
-	return (ost);
-}
-
-static char	*ft_zapis(char *ost)
-{
-	int		a;
-	int		b;
-	char 	*cpy;
+	int a;
 
 	a = 0;
-	b = 0;
-	while (ost[a] != '\0')
+	while ((str[a] != '\0') && (str[a] != '\n'))
 		a++;
-	while (ost[a] != '\n')
-		b++;
-	a = a - b;
-	cpy = malloc(sizeof(char) * a);
-	if (cpy == 0)
-		return (0);
-	a = 0;
-	while (ost[b] != '\0')
-	{
-		cpy[a] = ost[b];
-		b++;
-		a++;
-	}
-	return (cpy);
+	return (a);
 }
 
-static char *ft_perep(char *ost, char **line)
+int	get_next_line(int fd, char **line)
 {
-	int	a;
+	static char	*sum;
+	char 		*per;
+	int 		a;
 
-	a = 0;
-	while ((ost[a] != '\n') || (ost[a] != '\0'))
-		a++;
-	if (ost[a] == '\n')
-		a--;
-	*line = malloc(sizeof(char) * a);
-	if (*line == 0)
-		return (0);
-	while (a >= 0)
+	sum = NULL;
+	per = calloc(BUFFER_SIZE + 1, sizeof(char));
+	if ((per == 0) || (fd < 0) || (line = NULL) || (BUFFER_SIZE < 1))
+		return (-1);
+	while ((a = read(fd, per, BUFFER_SIZE)) != 0 )
 	{
-		*line[a] = ost[a];
-		a--;
+		per[a] = '\0';
+		sum = ft_strjoin(sum, per);
+		if (ft_strchr(sum, '\n'))
+			break ;
 	}
-	return (*line);
-}
-
-int get_next_line(int fd, char **line)
-{
-	static char	*ost;
-	int			a;
-	int 		b;
-
-	a = 0;
-	b = 0;
-	// начало цикла с у словием возможности считывания
-	while (ost[a] != '\0')
+	if(sum == NULL)
+		*line = strdup("");
+	else
+		*line = ft_substr(sum, 0, ft_dlina(sum));
+	if (ft_strchr(sum, '\n'))
+		sum = ft_substr(sum, ft_dlina(sum) + 1, ft_strlen(sum));
+	else
 	{
-		if (ost[a] == '\n')
-		{
-			*line = ft_perep(ost, line);
-			ost = ft_zapis(ost);
-			// проверка возврата на ошибку
-			return (1);
-		}
-		a++;
-	}
-	ost = ft_read(fd, ost, BUFF_SIZE);
-	while (ost[b] != '\0')
-		b++;
-	if (b < BUFF_SIZE)
-	{
-		*line = ft_perep(ost, line);
-		ost = ft_zapis(ost);
-		// проверка возврата на ошибку
+		free(sum);
 		return (0);
 	}
-	// решить проблемы с записью в буфер
-	// Запись в буфер
-	// }
+	return (1);
 }
-
-// to do list -> обработка ошибок, сокращение через strjoin, написание тестов
