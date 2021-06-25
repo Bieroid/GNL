@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-#include <stdio.h>
 
 size_t	ft_strlen(const char *s)
 {
@@ -52,7 +51,7 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	c = -1;
 	a = ft_strlen(s1);
 	b = ft_strlen(s2);
-	s = ft_calloc(sizeof(char), (a + b) + 1);
+	s = ft_calloc((a + b) + 1, sizeof(char));
 	if (s == 0)
 		return (0);
 	while (++c < a)
@@ -61,9 +60,9 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	a = 0;
 	while (a <= b)
 	{
+		c++;
 		s[c] = s2[a];
 		a++;
-		c++;
 	}
 	return (s);
 }
@@ -103,7 +102,7 @@ static char 	*ft_socr2(size_t a, unsigned int start, char const *s)
 	return (sub);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*ft_substr(char *s, unsigned int start, size_t len)
 {
 	size_t	a;
 	char	*sub;
@@ -122,6 +121,7 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 		sub = ft_socr1(len, s, start);
 	else
 		sub = ft_socr2(a, start, s);
+	free(s);
 	return (sub);
 }
 
@@ -140,4 +140,23 @@ char	*ft_strchr (const char *str, int ch)
 	if (str[a] == ch)
 		return ((char *)&str[a]);
 	return (0);
+}
+
+char	*ft_strdup(const char *str)
+{
+	char	*s;
+	int		a;
+
+	a = 0;
+	while (str[a] != '\0')
+		a++;
+	s = malloc(sizeof(char) * a + 1);
+	if (s == 0)
+		return (0);
+	while (a != -1)
+	{
+		s[a] = str[a];
+		a--;
+	}
+	return (s);
 }
